@@ -1,11 +1,17 @@
+import { theme } from '@/providers';
 import { AppRouter } from '@/routes';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet } from 'react-native';
+
+import { PaperProvider } from 'react-native-paper';
+
+
 
 export default function App() {
   return (
-    <AppRouter />
-  );
+    <PaperProvider theme={theme}>
+      <AppRouter />
+    </PaperProvider>);
 }
 
 const styles = StyleSheet.create({
