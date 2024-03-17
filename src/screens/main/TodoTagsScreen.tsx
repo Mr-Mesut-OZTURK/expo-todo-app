@@ -1,11 +1,14 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
+import { MainLayout } from '@/layouts'
 
 export const TodoTagsScreen = () => {
     return (
-        <View>
-            <Text>TodoTagsScreen</Text>
-        </View>
+        <MainLayout>
+            <View>
+                <Text>TodoTagsScreen</Text>
+            </View>
+        </MainLayout>
     )
 }
 
