@@ -1,6 +1,7 @@
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import React from 'react'
 import { ITodoItem } from '@/types'
+import moment from 'moment';
 
 
 interface TodoItemCardProps {
@@ -12,26 +13,46 @@ interface TodoItemCardProps {
 
 export const TodoItemCard = ({ item, onLongPres, onPress }: TodoItemCardProps) => {
     return (
-        <View style={styles.container}>
+        <View
+            style={{
+                ...styles.container,
+                backgroundColor: item.isDone === "done" ? "gray" : '#191d21',
+            }}
+        >
 
-            <View style={styles.coloredBar} />
+            <View
+                style={{
+                    ...styles.coloredBar,
+                    backgroundColor: item.isDone === "done" ? "green" : 'orange',
+                }}
+            />
 
             <TouchableOpacity
                 style={styles.infoContainer}
                 onLongPress={onLongPres}
                 onPress={onPress}
             >
-                <Text style={styles.tag}>
+                <Text
+                    style={{
+                        ...styles.tag,
+                        color: item.isDone === "done" ? "green" : 'orange',
+                    }}
+                >
                     {item?.title}
                 </Text>
 
-                <Text style={styles.itemTitle}>
+                <Text
+                    style={{
+                        ...styles.itemTitle,
+                        color: item.isDone === "done" ? "#999" : '#fff',
+                    }}
+                >
                     {item?.title}
                 </Text>
 
                 <Text style={styles.date}>
-                    {/* {item?.title} */}
-                    10:00 am - 12:00 am
+                    {moment(item?.date).format("DD MMM YYYY")}
+                    {/* 10:00 am - 12:00 am */}
                 </Text>
             </TouchableOpacity>
         </View>
@@ -45,12 +66,12 @@ const styles = StyleSheet.create({
         padding: 20,
         marginVertical: 8,
         marginHorizontal: 16,
-        backgroundColor: '#191d21',
+
         flex: 1,
         flexDirection: 'row',
     },
     coloredBar: {
-        backgroundColor: 'orange',
+        // backgroundColor: 'orange',
         width: 10,
         marginRight: 15,
         borderRadius: 5,
@@ -58,20 +79,20 @@ const styles = StyleSheet.create({
 
 
     infoContainer: {
-        backgroundColor: '#191d21',
+        // backgroundColor: '#191d21',
         flex: 1,
     },
     tag: {
         fontSize: 16,
-        color: 'orange',
+        // color: 'orange',
     },
     itemTitle: {
         fontSize: 32,
-        color: '#fff',
+        // color: '#fff',
     },
     date: {
         fontSize: 16,
-        color: 'purple',
+        color: '#9a95d9',
         fontWeight: '900',
     },
 })
