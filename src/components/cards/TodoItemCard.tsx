@@ -2,6 +2,7 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import React from 'react'
 import { ITodoItem } from '@/types'
 import moment from 'moment';
+import { useAppSelector } from '@/context';
 
 
 interface TodoItemCardProps {
@@ -12,18 +13,25 @@ interface TodoItemCardProps {
 
 
 export const TodoItemCard = ({ item, onLongPres, onPress }: TodoItemCardProps) => {
+
+    const { categories } = useAppSelector(state => state.category)
+
+    const selectedCategory = categories?.find(c => c.title === item?.categoryId)
+    // console.log({ selectedCategory, item });
+
     return (
         <View
             style={{
                 ...styles.container,
-                backgroundColor: item.isDone === "done" ? "gray" : '#191d21',
+                backgroundColor: item.isDone === "done" ? "gray" : '#233142',
+                // backgroundColor: selectedCategory?.color ? `${selectedCategory?.color?.slice(0, 7)}66` : "#191d21"
             }}
         >
 
             <View
                 style={{
                     ...styles.coloredBar,
-                    backgroundColor: item.isDone === "done" ? "green" : 'orange',
+                    backgroundColor: item.isDone === "done" ? "green" : selectedCategory?.color ? `${selectedCategory?.color?.slice(0, 7)}` : "orange",
                 }}
             />
 
@@ -35,10 +43,10 @@ export const TodoItemCard = ({ item, onLongPres, onPress }: TodoItemCardProps) =
                 <Text
                     style={{
                         ...styles.tag,
-                        color: item.isDone === "done" ? "green" : 'orange',
+                        color: item.isDone === "done" ? "green" : selectedCategory?.color ? `${selectedCategory?.color?.slice(0, 7)}` : "orange",
                     }}
                 >
-                    {item?.title}
+                    {selectedCategory?.title} -{moment(item?.date).format("DD MMM YYYY")}
                 </Text>
 
                 <Text
@@ -51,8 +59,10 @@ export const TodoItemCard = ({ item, onLongPres, onPress }: TodoItemCardProps) =
                 </Text>
 
                 <Text style={styles.date}>
-                    {moment(item?.date).format("DD MMM YYYY")}
-                    {/* 10:00 am - 12:00 am */}
+                    {/* {moment(item?.date).format("DD MMM YYYY")} */}
+                    {
+                        item?.description //?.slice(0, 20)
+                    }
                 </Text>
             </TouchableOpacity>
         </View>
@@ -87,12 +97,12 @@ const styles = StyleSheet.create({
         // color: 'orange',
     },
     itemTitle: {
-        fontSize: 32,
+        fontSize: 24,
         // color: '#fff',
     },
     date: {
         fontSize: 16,
         color: '#9a95d9',
-        fontWeight: '900',
+        // fontWeight: '900',
     },
 })
