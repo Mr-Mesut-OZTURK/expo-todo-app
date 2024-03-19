@@ -1,10 +1,9 @@
 import { IKeyvalueItem } from "@/types";
-import * as SQLite from "expo-sqlite";
+import { palaDB } from "./sqlite";
 
-const db = SQLite.openDatabase("todo.db");
 
 const keyvalueTableInit = () => {
-    db.transaction((tx) => {
+    palaDB.transaction((tx) => {
         tx.executeSql(
             "CREATE TABLE IF NOT EXISTS keyvalue (id INTEGER PRIMARY KEY AUTOINCREMENT, key VARCHAR(255) NOT NULL, value VARCHAR(255) NOT NULL)",
             [],
@@ -16,7 +15,7 @@ const keyvalueTableInit = () => {
 };
 
 const insertKeyvalue = (value: IKeyvalueItem, callback: () => void) => {
-    db.transaction((tx) => {
+    palaDB.transaction((tx) => {
         tx.executeSql(
             "INSERT INTO `keyvalue` ('key', 'value') VALUES (?, ?)",
             [
@@ -35,7 +34,7 @@ const insertKeyvalue = (value: IKeyvalueItem, callback: () => void) => {
 const fetchKeyValues = (callback: any) => {
     return new Promise((resolve, reject) => {
 
-        db.transaction((tx) => {
+        palaDB.transaction((tx) => {
             tx.executeSql(
                 "SELECT * FROM keyvalue;",
                 undefined,
@@ -50,8 +49,8 @@ const fetchKeyValues = (callback: any) => {
     })
 };
 
-const updateKeyValue = (id: SQLite.SQLStatementArg, completed: any) => {
-    db.transaction((tx) => {
+const updateKeyValue = (id: string, completed: any) => {
+    palaDB.transaction((tx) => {
         tx.executeSql("UPDATE keyvalue SET isDone = ? WHERE id = ?",
             [
                 completed,
@@ -63,8 +62,8 @@ const updateKeyValue = (id: SQLite.SQLStatementArg, completed: any) => {
     });
 };
 
-const deleteKeyvalue = (id: SQLite.SQLStatementArg) => {
-    db.transaction((tx) => {
+const deleteKeyvalue = (id: string) => {
+    palaDB.transaction((tx) => {
         tx.executeSql("DELETE FROM keyvalue WHERE key = ?", [id]);
     });
 };
