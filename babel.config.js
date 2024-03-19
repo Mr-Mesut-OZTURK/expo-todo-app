@@ -7,6 +7,13 @@ module.exports = function (api) {
         plugins: [
           'react-native-paper/babel',
           'react-native-reanimated/plugin', // HERE
+
+          // 'babel-plugin-module-resolver', {
+          //   alias: {
+          //     'react-native-vector-icons': '@expo/vector-icons',
+          //   },
+          // }
+
         ],
       },
     },

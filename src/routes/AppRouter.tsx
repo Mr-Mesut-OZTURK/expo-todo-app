@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-
-import { OnboardingScreen, SplashScreen } from '@/screens';
-import { MainRouter } from './MainRouter';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+
+import { MainRouter } from './MainRouter';
 import { AuthRouter } from './AuthRouter';
+import { OnboardingScreen, SplashScreen } from '@/screens';
 
 
 const Stack = createStackNavigator()
@@ -25,12 +25,12 @@ export const AppRouter = () => {
 
 
     const getStorage = async () => {
-        await AsyncStorage.removeItem('ONBOARDED');
+        // await AsyncStorage.removeItem('ONBOARDED');
 
         const signed = await AsyncStorage.getItem('SIGNED');
+        setIsSignedIn(JSON.parse(signed ?? "false"))
         const onboarded = await AsyncStorage.getItem('ONBOARDED');
         setOnboarded(JSON.parse(onboarded ?? "false"));
-        setIsSignedIn(JSON.parse(signed ?? "false"))
         setTimeout(() => {
             setLoading(false)
         }, 500)
@@ -74,6 +74,5 @@ export const AppRouter = () => {
 
             </Stack.Navigator>
         </NavigationContainer>
-
     )
 }

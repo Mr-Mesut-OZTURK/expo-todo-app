@@ -2,7 +2,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
-import { AccountScreen, CreateUpdateTodoScreen, HomeScreen, TodoDetailScreen, TodoTagsScreen } from '@/screens';
+import { AccountScreen, CreateUpdateTodoScreen, HomeScreen, TodoDetailScreen, CategoriesScreen } from '@/screens';
 
 
 
@@ -28,7 +28,7 @@ const TabRouter = () => {
                             <Ionicons
                                 name={focused ? 'home' : "home-outline"}
                                 size={24}
-                                color="orange"
+                                color="#de2820"
                             />
                         )
                     },
@@ -45,7 +45,7 @@ const TabRouter = () => {
                             <Ionicons
                                 name={focused ? 'person' : "person-outline"}
                                 size={24}
-                                color="orange"
+                                color="#de2820"
                             />
                         )
                     },
@@ -89,8 +89,8 @@ export const MainRouter = () => {
                 }}
             />
             <Stack.Screen
-                name="todo-tags"
-                component={TodoTagsScreen}
+                name="categories"
+                component={CategoriesScreen}
                 options={{
                     title: "Taglar",
                 }}
