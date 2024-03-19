@@ -1,13 +1,18 @@
-import { ScrollView, StyleSheet, Text, View } from 'react-native'
+import Toast from 'react-native-toast-message';
 import React, { useEffect, useState } from 'react'
-import { MainLayout } from '@/layouts'
-import { Button, FAB, Modal, Portal, TextInput } from 'react-native-paper';
-import { NavigationProp } from '@react-navigation/native';
-import { Ionicons } from '@expo/vector-icons';
-import { TouchableOpacity } from 'react-native-gesture-handler';
 import { Calendar } from 'react-native-calendars';
-import { addTodo, useAppDispatch } from '@/context';
-import { todoTableInit, insertTask, fetchTasks } from '@/db';
+import { Button, TextInput } from 'react-native-paper';
+import { NavigationProp } from '@react-navigation/native';
+import { SelectList } from 'react-native-dropdown-select-list';
+import { ScrollView, StyleSheet, Text, View } from 'react-native'
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+import { MainLayout } from '@/layouts'
+import { ICategoryItem } from '@/types';
+import { GoBackButton } from '@/components';
+import { todoTableInit, insertTodo, fetchTodos } from '@/db';
+import { setTodos, useAppDispatch, useAppSelector } from '@/context';
+import { Ionicons } from '@expo/vector-icons';
 
 
 interface ICreateUpdateTodoScreenProps {
@@ -17,30 +22,59 @@ interface ICreateUpdateTodoScreenProps {
 export const CreateUpdateTodoScreen = ({ navigation }: ICreateUpdateTodoScreenProps) => {
 
     const dispatch = useAppDispatch()
-    const [text, setText] = useState("");
-    const [visible, setVisible] = useState(false);
-
-    const showModal = () => setVisible(true);
-    const hideModal = () => setVisible(false);
-
 
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
+    const [category, setCategory] = useState("");
     const [date, setDate] = useState(new Date().toDateString());
+    const { categories } = useAppSelector(state => state.category)
+    const [userId, setUserId] = useState("")
+
 
     useEffect(() => {
         todoTableInit();
-        // refreshTasks();
+        // todoTableAlter()
+        // refreshTodos();
     }, []);
 
+    useEffect(() => {
+        getUserId()
+    }, []);
+
+    const getUserId = async () => {
+        const userId = await AsyncStorage.getItem('SIGNED');
+        setUserId(userId ?? "")
+    }
 
     const handleAddTodo = () => {
-        // dispatch(addTodo({
-        //     title,
-        //     description,
-        //     date,
-        // }))
-        insertTask({ title, description, date }, () => fetchTasks(navigation.goBack))
+
+        insertTodo(
+            {
+                title,
+                description,
+                date,
+                userId,
+                categoryId: category,
+            },
+            () => {
+
+                Toast.show({
+                    type: 'success',
+                    text1: 'Todo',
+                    text2: 'Successfully added todo 👋'
+                })
+                setTimeout(() => {
+                    fetchTodos(
+                        userId,
+                        (array: Array<ICategoryItem>) => {
+                            dispatch(setTodos(array))
+                            navigation.goBack()
+                        }
+                    )
+                }, 500)
+
+            }
+        )
 
     }
 
@@ -48,59 +82,80 @@ export const CreateUpdateTodoScreen = ({ navigation }: ICreateUpdateTodoScreenPr
         <MainLayout>
             <ScrollView style={styles.container}>
 
-                <TouchableOpacity
-                    style={styles.backContainer}
+                <GoBackButton
+                    text='Geri'
                     onPress={() => {
                         navigation.goBack()
                     }}
-                >
-                    <Ionicons
-                        name="arrow-back"
-                        size={40}
-                        color="orange"
-                    />
-
-                    <Text style={{ fontSize: 24, fontWeight: '800', marginLeft: 10, color: '#393939' }}>
-                        Geri
-                    </Text>
-                </TouchableOpacity>
+                />
 
                 <View style={styles.formContainer}>
                     <Text
                         style={{
-                            fontSize: 24,
-                            color: '#fff',
+                            fontSize: 32,
+                            // color: '#333',
+                            fontWeight: '700',
                             marginBottom: 20,
+                            textAlign: 'center',
+                            backgroundColor: '#de2820',
+                            paddingVertical: 15,
+                            color: '#fff',
                         }}
                     >
-                        Yapılacak İşi Oluştur
+                        Create Todo
                     </Text>
 
-                    <TextInput
-                        label="İsim"
-                        mode='outlined'
-                        style={{
-                            marginBottom: 10,
-                            marginTop: 10,
+                    <SelectList
+
+                        setSelected={(val: any) => {
+                            setCategory(val)
+                            console.log({ val });
                         }}
-                        value={title}
-                        onChange={(e) => {
-                            // console.log({ e: e.nativeEvent.text })
-                            setTitle(e.nativeEvent.text)
+                        data={categories.map((item: ICategoryItem) => ({ key: item.id, value: item.title }))}
+                        save="value"
+                        placeholder='Select Category'
+
+                        boxStyles={{
+                            borderRadius: 3,
+                            backgroundColor: '#fffbfe',
+                            marginBottom: 8,
+                        }}
+
+                        dropdownStyles={{
+                            borderRadius: 3,
+                            backgroundColor: '#fffbfe',
+                            top: 0,
+                            marginTop: -5,
+                            // borderTopWidth: 0,
                         }}
                     />
 
                     <TextInput
+                        label="Title"
                         mode='outlined'
-                        label="Açıklama"
+                        style={{
+                            marginBottom: 10,
+                            // marginTop: 10,
+                        }}
+                        value={title}
+                        onChange={(e) => {
+                            setTitle(e.nativeEvent.text)
+                        }}
+                    />
+
+
+
+                    <TextInput
+                        mode='outlined'
+                        label="Description"
                         multiline
                         numberOfLines={4}
                         style={{
                             marginBottom: 20,
+                            // ...(Platform.OS === "ios" && { paddingBottom: 100 })
                         }}
                         value={description}
                         onChange={(e) => {
-                            // console.log({ e: e.nativeEvent.text })
                             setDescription(e.nativeEvent.text)
                         }}
                     />
@@ -110,6 +165,8 @@ export const CreateUpdateTodoScreen = ({ navigation }: ICreateUpdateTodoScreenPr
                         style={{
                             borderRadius: 10,
                             marginBottom: 20,
+                            borderColor: '#777',
+                            borderWidth: 1,
                         }}
                         initialDate={date}
                         markedDates={{
@@ -120,58 +177,35 @@ export const CreateUpdateTodoScreen = ({ navigation }: ICreateUpdateTodoScreenPr
                             // '2024-03-19': { disabled: true, disableTouchEvent: true }
                         }}
                         onDayPress={(value) => {
-                            console.log({ value: value.dateString });
                             setDate(value.dateString)
+                        }}
+                        renderArrow={(prop) => {
+                            return (
+                                <Ionicons
+                                    color="#de2820"
+                                    size={24}
+                                    name={prop === "left" ? 'arrow-back' : 'arrow-forward'}
+                                />
+                            )
                         }}
                     />
 
                     <Button
                         mode='contained'
                         style={{
-                            borderRadius: 10,
+                            borderRadius: 5,
+                            // backgroundColor: '#de2820',
                         }}
+                        buttonColor='#de2820'
                         onPress={() => {
-                            // console.log("object");
                             handleAddTodo()
                         }}
+                        disabled={!category || !title || !description || !date}
                     >
-                        Oluştur
+                        Create Todo
                     </Button>
 
                 </View>
-
-
-
-
-                <Portal>
-                    <Modal
-                        visible={visible}
-                        onDismiss={hideModal}
-                        contentContainerStyle={styles.modal}
-                    >
-                        <Text>Yapılacak işi giriniz.</Text>
-                        <TextInput
-                            label="İş"
-                            value={text}
-                            onChangeText={text => setText(text)}
-                            style={{
-                                marginBottom: 10,
-                                marginTop: 10,
-                            }}
-                        />
-                        <Button
-                            icon="pencil"
-                            mode="contained"
-                            onPress={() => {
-                                // setList((prev) => ([...prev, text]))
-                                setText("")
-                                hideModal()
-                            }}
-                        >
-                            Ekle
-                        </Button>
-                    </Modal>
-                </Portal>
 
             </ScrollView>
         </MainLayout>
@@ -185,14 +219,10 @@ const styles = StyleSheet.create({
         padding: 10,
         paddingBottom: 50,
     },
-    backContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginBottom: 10,
-    },
+
 
     formContainer: {
-        backgroundColor: '#393939',
+        // backgroundColor: '#393939',
         flex: 1,
         marginBottom: 50,
         padding: 20,

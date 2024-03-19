@@ -1,11 +1,12 @@
-import { Alert, StyleSheet, Text, Vibration, View } from 'react-native'
 import React, { useEffect, useState } from 'react'
-import { AuthLayout } from '@/layouts'
 import { Button, TextInput } from 'react-native-paper'
 import { NavigationProp } from '@react-navigation/native'
-import { fetchUser, userTableInit } from '@/db'
-import { IUserItem } from '@/types'
+import { Alert, StyleSheet, Text, Vibration } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+
+import { IUserItem } from '@/types'
+import { AuthLayout } from '@/layouts'
+import { fetchUser, userTableInit } from '@/db'
 
 
 interface ScreenProps {
@@ -26,26 +27,24 @@ export const LoginScreen = ({ navigation }: ScreenProps) => {
     const handleSubmit = async () => {
 
         if (!name || !password) {
-            console.log("object");
             Vibration.vibrate()
             Alert.alert('Alert', `Please enter ${!name ? "name" : ""} ${!password ? "password" : ""}`, [
-                // {
-                //   text: 'Cancel',
-                //   onPress: () => console.log('Cancel Pressed'),
-                //   style: 'cancel',
-                // },
-                { text: 'OK', onPress: () => console.log('OK Pressed') },
+
+                { text: 'OK', onPress: () => null },
             ]);
         } else {
 
             const res: Array<IUserItem> | any = await fetchUser({ name, password }, () => null)
+            console.log({ res });
             if (!!res?.length) {
-                AsyncStorage.setItem('SIGNED', "true");
+                console.log({ res });
+                AsyncStorage.setItem('SIGNED', JSON.stringify(res?.[0]?.id ?? ""));
                 navigation.navigate("main", { screen: "tabScreens", params: { screen: "home" } })
             } else {
+                console.log({ res });
                 Vibration.vibrate()
                 Alert.alert('Alert', `Wrong name or password!`, [
-                    { text: 'OK', onPress: () => console.log('OK Pressed') },
+                    { text: 'OK', onPress: () => null },
                 ]);
             }
 
@@ -108,6 +107,8 @@ export const LoginScreen = ({ navigation }: ScreenProps) => {
                 onPress={() => {
                     handleSubmit()
                 }}
+                buttonColor='#de2820'
+                disabled={!name || !password}
             >
                 Login
             </Button>
@@ -122,7 +123,6 @@ export const LoginScreen = ({ navigation }: ScreenProps) => {
                     // padding: 8
                 }}
                 onPress={() => {
-                    // console.log("object");
                     // handleAddTodo()
                     navigation.navigate("register")
                 }}

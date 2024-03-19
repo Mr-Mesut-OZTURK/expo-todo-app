@@ -5,6 +5,7 @@ import { Button, TextInput } from 'react-native-paper'
 import { NavigationProp } from '@react-navigation/native'
 import { fetchUser, insertUser, userTableInit } from '@/db'
 import { IUserItem } from '@/types'
+import Toast from 'react-native-toast-message';
 
 
 interface ScreenProps {
@@ -26,27 +27,28 @@ export const RegisterScreen = ({ navigation }: ScreenProps) => {
         if (!name || !password) {
             Vibration.vibrate()
             Alert.alert('Alert', `Please enter ${!name && name} ${!password && password}`, [
-                // {
-                //   text: 'Cancel',
-                //   onPress: () => console.log('Cancel Pressed'),
-                //   style: 'cancel',
-                // },
-                { text: 'OK', onPress: () => console.log('OK Pressed') },
+                { text: 'OK', onPress: () => null },
             ]);
         } else {
 
             const res: Array<IUserItem> | any = await fetchUser({ name, password }, () => null)
             if (res?.[0]?.name !== name) {
-                insertUser({ name, password }, () => navigation.navigate)
+                insertUser({ name, password }, () => {
+
+                    Toast.show({
+                        type: 'success',
+                        text1: 'Hello',
+                        text2: 'User created successfully, you can login 👋'
+                    });
+
+                    setTimeout(() => {
+                        navigation.navigate("auth", { screen: 'login' })
+                    }, 500)
+                })
             } else {
                 Vibration.vibrate()
                 Alert.alert('Alert', `User already using!`, [
-                    // {
-                    //   text: 'Cancel',
-                    //   onPress: () => console.log('Cancel Pressed'),
-                    //   style: 'cancel',
-                    // },
-                    { text: 'OK', onPress: () => console.log('OK Pressed') },
+                    { text: 'OK', onPress: () => null },
                 ]);
             }
 
@@ -107,6 +109,8 @@ export const RegisterScreen = ({ navigation }: ScreenProps) => {
                 onPress={() => {
                     handleSubmit()
                 }}
+                buttonColor='#de2820'
+                disabled={!name || !password}
             >
                 Sign Up
             </Button>

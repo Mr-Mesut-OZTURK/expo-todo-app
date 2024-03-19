@@ -1,114 +1,182 @@
-import { TodoItemCard } from '@/components';
-import { delTodo, getTodos, useAppDispatch, useAppSelector } from '@/context';
-import { MainLayout } from '@/layouts';
+import { FAB } from 'react-native-paper';
 import { NavigationProp } from '@react-navigation/native';
-import React, { useEffect, useState } from 'react'
-import { FlatList, Image, Platform, Pressable, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import { Button, FAB, Modal, Portal, TextInput } from 'react-native-paper';
-import * as SQLite from 'expo-sqlite'
-import { deleteTask, fetchTasks, todoTableInit, insertTask, updateTaskCompletion } from '@/db';
-import { ITodoItem } from '@/types';
+import React, { useEffect, useRef, useState } from 'react'
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { CalendarProvider, ExpandableCalendar } from 'react-native-calendars';
+import { Dimensions, FlatList, ScrollView, StyleSheet, Text, View } from 'react-native'
 
-interface HomeScreenProps {
+import { ICategoryItem, ITodoItem } from '@/types';
+import { MainLayout } from '@/layouts';
+import { CategoriesSection } from '@/sections';
+import { SectionTitle, TodoItemCard } from '@/components';
+import { setTodos, useAppDispatch, useAppSelector } from '@/context';
+import { categoryTableInit, deleteTodo, fetchTodos, todoTableInit, updateTodoCompletion } from '@/db';
+import { Ionicons } from '@expo/vector-icons';
+
+
+
+
+interface ScreenProps {
     navigation: NavigationProp<any | any>
 }
 
-// function openDatabase() {
-//     if (Platform.OS === "web") {
-//         return {
-//             transaction: () => {
-//                 return {
-//                     executeSql: () => { },
-//                 };
-//             },
-//         };
-//     }
 
-//     const db = SQLite.openDatabase("@/db/sqlite.db");
-//     return db;
-// }
-
-export const HomeScreen = ({ navigation }: HomeScreenProps) => {
+export const HomeScreen = ({ navigation }: ScreenProps) => {
 
     const dispatch = useAppDispatch()
-    const { todoList } = useAppSelector(state => state.todo)
+    const [userId, setUserId] = useState("")
+    const [filteredTodos, setFilteredTodos] = useState<Array<ITodoItem>>([])
+    const todayBtnTheme = useRef({
+        todayButtonTextColor: "red",
+    });
 
-    const [value, setValue] = useState("");
-    const [tasks, setTasks] = useState([]);
+    const { todos } = useAppSelector(state => state.todo)
 
     useEffect(() => {
         todoTableInit();
-        refreshTasks();
+        categoryTableInit();
+        getUserId()
     }, []);
 
-    const refreshTasks = () => {
-        fetchTasks(setTasks);
+    useEffect(() => {
+        if (userId) {
+            refreshTodos();
+        }
+    }, [userId]);
+
+    useEffect(() => {
+        setFilteredTodos(todos)
+    }, [todos])
+
+
+    const getUserId = async () => {
+        const userId = await AsyncStorage.getItem('SIGNED');
+        setUserId(userId ?? "")
+    }
+
+    const refreshTodos = () => {
+        fetchTodos(userId, (array: any) => {
+            dispatch(setTodos(array))
+        });
     };
 
-    const toggleTaskCompletion = (id: SQLite.SQLStatementArg, completed: any) => {
-        updateTaskCompletion(id, completed);
-        refreshTasks();
+    const toggleTodoCompletion = (id: string, completed: any) => {
+        updateTodoCompletion(id, completed);
+        refreshTodos();
     };
 
-    const removeTask = (id: any) => {
-        deleteTask(id);
-        refreshTasks();
+    const removeTodo = (id: any) => {
+        deleteTodo(id);
+        refreshTodos();
     };
 
-    // const addTask = () => {
-    //     if (value.trim().length === 0) return;
-    //     insertTask(value, refreshTasks);
-    //     setValue("")
-    // };
-    console.log({ tasks });
+    const handleFilterByDate = ({ dateString }: any) => {
+        const newList = todos?.filter((todo: ITodoItem) => todo.date === dateString)
+        setFilteredTodos(newList)
+    }
+
+    const handleFilterByCategory = (category: ICategoryItem) => {
+        console.log({ category });
+        const newList = todos?.filter((todo: ITodoItem) => todo.categoryId === category.title)
+        setFilteredTodos(newList)
+    }
 
     return (
         <MainLayout>
-
             <View style={styles.container}>
+                <CalendarProvider
+                    date={Date()}
+                    theme={todayBtnTheme.current}
+                    showTodayButton
+                    todayButtonStyle={{
+                        bottom: 90,
+                    }}
+                >
+                    <View style={{ height: 180, zIndex: 10 }}>
+                        <ExpandableCalendar
+                            onDayPress={handleFilterByDate}
+                            firstDay={1}
 
-                <View style={styles.upperContainer}>
 
-                    <Image
-                        style={styles.profileImage}
-                        source={{ uri: "https://wac-cdn.atlassian.com/dam/jcr:ba03a215-2f45-40f5-8540-b2015223c918/Max-R_Headshot%20(1).jpg?cdnVersion=1483" }}
-                    />
-                    <View style={styles.upperInfoContainer}>
-
-                        <Text style={styles.name}>Name Surname</Text>
-                        <Text style={styles.email}>example@email.com</Text>
+                            renderArrow={(prop) => {
+                                return (
+                                    <Ionicons
+                                        color="#de2820"
+                                        size={24}
+                                        name={prop === "left" ? 'arrow-back' : 'arrow-forward'}
+                                    />
+                                )
+                            }}
+                        />
                     </View>
 
-                </View>
+                    <ScrollView style={styles.todosContainer} >
 
-                <View style={styles.todosContainer}>
+                        <CategoriesSection
+                            navigation={navigation}
+                            handleFilterByCategory={handleFilterByCategory}
+                        />
 
-                    <FlatList
-                        data={tasks}
-                        renderItem={({ item }: { item: ITodoItem }) => (
-                            <TodoItemCard
-                                item={item}
-                                onLongPres={() => {
-                                    // dispatch(delTodo(item))
-                                    removeTask(item?.id ?? null)
+
+
+                        <ScrollView horizontal style={{ flex: 1 }} scrollEnabled={false}>
+                            <FlatList
+                                scrollEnabled={false}
+                                ListHeaderComponent={
+                                    <SectionTitle
+                                        title='Todos'
+                                        rightButton='All'
+                                        onPress={() => {
+                                            setFilteredTodos(todos)
+                                        }}
+                                    />
+                                }
+                                style={{
+                                    width: Dimensions.get('screen').width,
+                                    flex: 1,
+                                    // marginTop: 100,
+                                    // backgroundColor: 'green'
                                 }}
-                                onPress={() => {
-                                    // dispatch(delTodo(item))
+                                contentContainerStyle={{
+                                    paddingBottom: 100
+                                }}
 
-                                    const isCompleted = item.isDone !== "inprogress" ? "inprogress" : "done"
-                                    console.log({ isCompleted });
-                                    toggleTaskCompletion(item?.id ?? null, isCompleted)
+                                data={filteredTodos}
+                                renderItem={({ item }: { item: ITodoItem }) => (
+                                    <TodoItemCard
+                                        item={item}
+                                        onLongPres={() => {
+                                            removeTodo(item?.id ?? null)
+                                        }}
+                                        onPress={() => {
+                                            const isCompleted = item.isDone !== "inprogress" ? "inprogress" : "done"
+                                            toggleTodoCompletion(item?.id ? `${item?.id}` : "", isCompleted)
+                                        }}
+                                    />
+                                )}
+                                keyExtractor={(item, index) => `${item}-${index}`}
+                                ListEmptyComponent={() => {
+                                    return (
+                                        <View style={{ marginBottom: 20 }}>
+                                            <Text style={{ textAlign: 'center' }}>
+                                                There is no todo!
+                                            </Text>
+                                        </View>
+                                    )
                                 }}
                             />
-                        )}
-                        keyExtractor={(item, index) => `${item}-${index}`}
-                    />
 
 
+
+                        </ScrollView>
+
+                    </ScrollView>
 
                     <FAB
                         icon="plus"
+                        color='#fff'
                         style={styles.fab}
+
                         onPress={() => {
                             navigation.navigate("main", {
                                 screen: "todo-create"
@@ -116,51 +184,8 @@ export const HomeScreen = ({ navigation }: HomeScreenProps) => {
                         }}
                     />
 
-
-                    {/* 
-                    <View style={styles.container}>
-                        <View style={styles.inputContainer}>
-                            <TextInput
-                                style={styles.input}
-                                placeholder="Enter new task"
-                                value={value}
-                                onChangeText={setValue}
-                            />
-                            <Pressable onPress={addTask} style={styles.addButton}>
-                                <Text style={styles.addButton}>+</Text>
-                            </Pressable>
-                        </View>
-                        <FlatList
-                            data={tasks}
-                            keyExtractor={(item) => item.id.toString()}
-                            renderItem={({ item }: { item: any }) => (
-                                <View style={styles.listItem}>
-                                    <Pressable
-                                        onPress={() => toggleTaskCompletion(item?.id, item.completed)}
-                                    >
-                                        <Text
-                                            style={{
-                                                textDecorationLine: item.completed ? "line-through" : "none",
-                                            }}
-                                        >
-                                            {item.value}
-                                        </Text>
-                                    </Pressable>
-                                    <Pressable
-                                        onPress={() => removeTask(item.id)}
-                                        style={styles.deleteButton}
-                                    >
-                                        <Text style={styles.deleteButtonText}>Delete</Text>
-                                    </Pressable>
-                                </View>
-                            )}
-                        />
-                    </View> */}
-
-                </View>
-
+                </CalendarProvider>
             </View>
-
         </MainLayout>
     )
 }
@@ -171,94 +196,17 @@ const styles = StyleSheet.create({
         flex: 1,
     },
 
-    upperContainer: {
-        backgroundColor: '#f1f1f1',
-        padding: 20,
-        paddingBottom: 70,
-        flexDirection: 'row',
-
-    },
-    profileImage: {
-        width: 100,
-        height: 100,
-        borderRadius: 50,
-    },
-    upperInfoContainer: {
-        marginLeft: 10,
-        justifyContent: 'center',
-    },
-    name: {
-        fontSize: 24,
-        marginBottom: 5,
-        fontWeight: '700'
-    },
-    email: {
-
-    },
     todosContainer: {
-        backgroundColor: '#393939',
         flex: 1,
-        borderTopLeftRadius: 50,
-        borderTopRightRadius: 50,
-        marginTop: -50,
-
-        paddingTop: 30,
     },
-
 
     fab: {
         position: 'absolute',
         margin: 16,
         right: 0,
         bottom: 0,
+        backgroundColor: '#de2820',
+        color: '#fff'
     },
-
-
-    // container: {
-    //     flex: 1,
-    //     marginTop: 30,
-    //     backgroundColor: "#fff",
-    //     alignItems: "center",
-    //     justifyContent: "center",
-    //   },
-    // inputContainer: {
-    //     flexDirection: "row",
-    //     paddingHorizontal: 12,
-    //     marginBottom: 20,
-    // },
-    // addButton: {
-    //     backgroundColor: "#007bff",
-    //     width: 40,
-    //     height: 40,
-    //     justifyContent: "center",
-    //     alignItems: "center",
-    //     borderRadius: 4,
-    // },
-    // input: {
-    //     flex: 1,
-    //     height: 40,
-    //     borderColor: "gray",
-    //     borderWidth: 1,
-    //     marginRight: 10,
-    //     paddingLeft: 10,
-    // },
-    // listItem: {
-    //     flexDirection: "row",
-    //     paddingHorizontal: 15,
-    //     marginVertical: 8,
-    //     alignItems: "center",
-    //     justifyContent: "space-between",
-    //     width: "100%",
-    // },
-    // deleteButton: {
-    //     backgroundColor: "#B52C2C",
-    //     padding: 10,
-    //     borderRadius: 4,
-    //     justifyContent: "center",
-    //     alignItems: "center",
-    // },
-    // deleteButtonText: {
-    //     color: "#ffffff",
-    // },
 
 })
