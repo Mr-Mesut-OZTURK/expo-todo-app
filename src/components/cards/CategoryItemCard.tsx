@@ -38,10 +38,11 @@ export const CategoryItemCard = ({ item, onPress, onDelete }: ComponentProps) =>
             </Text>
 
             {onDelete && (<Ionicons
-                name="trash-bin"
+                name="trash"
                 size={40}
-                // color="#be3144"
-                color={`${item.color.slice(0, 7)}` ?? "#000"}
+                color="#be3144"
+                // color={`${item.color.slice(0, 7)}` ?? "#000"}
+
 
                 onPress={onDelete}
             />)}

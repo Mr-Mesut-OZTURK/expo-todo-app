@@ -1,70 +1,85 @@
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import React from 'react'
-import { ITodoItem } from '@/types'
 import moment from 'moment';
+import { Ionicons } from '@expo/vector-icons';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+
+import { ITodoItem } from '@/types'
 import { useAppSelector } from '@/context';
 
 
 interface TodoItemCardProps {
     item: ITodoItem;
-    onLongPres?: (e?: any) => void;
+    onDelete?: (e?: any) => void;
     onPress?: (e?: any) => void;
 }
 
 
-export const TodoItemCard = ({ item, onLongPres, onPress }: TodoItemCardProps) => {
+export const TodoItemCard = ({ item, onDelete, onPress }: TodoItemCardProps) => {
 
     const { categories } = useAppSelector(state => state.category)
-
     const selectedCategory = categories?.find(c => c.title === item?.categoryId)
-    // console.log({ selectedCategory, item });
+
 
     return (
         <View
             style={{
                 ...styles.container,
-                backgroundColor: item.isDone === "done" ? "gray" : '#233142',
-                // backgroundColor: selectedCategory?.color ? `${selectedCategory?.color?.slice(0, 7)}66` : "#191d21"
+                backgroundColor: item.isDone === "done" ? "#ccc" : '#233142',
+                borderColor: item.isDone === "done" ? "#233142" : '#fff',
+                borderWidth: item.isDone === "done" ? 1 : 0,
             }}
         >
 
             <View
                 style={{
                     ...styles.coloredBar,
-                    backgroundColor: item.isDone === "done" ? "green" : selectedCategory?.color ? `${selectedCategory?.color?.slice(0, 7)}` : "orange",
+                    backgroundColor: item.isDone === "done" ? "green" : selectedCategory?.color ? `${selectedCategory?.color?.slice(0, 7)}` : "gray",
                 }}
             />
 
             <TouchableOpacity
                 style={styles.infoContainer}
-                onLongPress={onLongPres}
                 onPress={onPress}
             >
                 <Text
                     style={{
                         ...styles.tag,
-                        color: item.isDone === "done" ? "green" : selectedCategory?.color ? `${selectedCategory?.color?.slice(0, 7)}` : "orange",
+                        color: item.isDone === "done" ? "green" : selectedCategory?.color ? `${selectedCategory?.color?.slice(0, 7)}` : "gray",
                     }}
                 >
-                    {selectedCategory?.title} -{moment(item?.date).format("DD MMM YYYY")}
+                    {selectedCategory?.title ?? "Deleted"} -{moment(item?.date).format("DD MMM YYYY")}
                 </Text>
 
                 <Text
                     style={{
                         ...styles.itemTitle,
-                        color: item.isDone === "done" ? "#999" : '#fff',
+                        color: item.isDone === "done" ? "#333" : '#fff',
+                        textDecorationLine: item.isDone === "done" ? "line-through" : 'none',
                     }}
                 >
                     {item?.title}
                 </Text>
 
-                <Text style={styles.date}>
-                    {/* {moment(item?.date).format("DD MMM YYYY")} */}
+                <Text
+                    style={{
+                        ...styles.date,
+                        textDecorationLine: item.isDone === "done" ? "line-through" : 'none',
+                        color: item.isDone === "done" ? "#666" : '#9a95d9',
+                    }}
+                >
                     {
                         item?.description //?.slice(0, 20)
                     }
                 </Text>
             </TouchableOpacity>
+
+            <Ionicons
+                onPress={onDelete}
+                name="trash"
+                size={32}
+                color="gray"
+            // color="#de2820"
+            />
         </View>
     )
 }
@@ -102,7 +117,7 @@ const styles = StyleSheet.create({
     },
     date: {
         fontSize: 16,
-        color: '#9a95d9',
+        // color: '#9a95d9',
         // fontWeight: '900',
     },
 })

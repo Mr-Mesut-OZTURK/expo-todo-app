@@ -110,14 +110,15 @@ export const HomeScreen = ({ navigation }: ScreenProps) => {
                         />
                     </View>
 
-                    <ScrollView style={styles.todosContainer} >
+                    <ScrollView
+                        style={styles.todosContainer}
+                        showsVerticalScrollIndicator={false}
+                    >
 
                         <CategoriesSection
                             navigation={navigation}
                             handleFilterByCategory={handleFilterByCategory}
                         />
-
-
 
                         <ScrollView horizontal style={{ flex: 1 }} scrollEnabled={false}>
                             <FlatList
@@ -145,7 +146,7 @@ export const HomeScreen = ({ navigation }: ScreenProps) => {
                                 renderItem={({ item }: { item: ITodoItem }) => (
                                     <TodoItemCard
                                         item={item}
-                                        onLongPres={() => {
+                                        onDelete={() => {
                                             removeTodo(item?.id ?? null)
                                         }}
                                         onPress={() => {

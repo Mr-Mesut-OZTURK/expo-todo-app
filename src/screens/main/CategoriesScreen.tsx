@@ -129,9 +129,13 @@ export const CategoriesScreen = ({ navigation }: ScreenProps) => {
                 />
 
                 <FlatList
+                    showsVerticalScrollIndicator={false}
                     data={categories}
                     style={{
                         marginTop: 10,
+                    }}
+                    contentContainerStyle={{
+                        paddingBottom: 150
                     }}
                     keyExtractor={(item, index) => `${item}-${index}`}
                     renderItem={({ item }) => {

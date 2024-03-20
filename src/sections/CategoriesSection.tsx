@@ -47,7 +47,12 @@ export const CategoriesSection = ({ navigation, handleFilterByCategory }: Sectio
                 }}
             />
 
-            <ScrollView horizontal style={{ marginBottom: 20, marginTop: 10 }}>
+            <ScrollView
+                horizontal
+                style={{ marginBottom: 20, marginTop: 10 }}
+                showsVerticalScrollIndicator={false}
+                showsHorizontalScrollIndicator={false}
+            >
                 {
                     categories?.map((item, index) => {
                         return (

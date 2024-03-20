@@ -24,11 +24,11 @@ export const CreateUpdateTodoScreen = ({ navigation }: ICreateUpdateTodoScreenPr
     const dispatch = useAppDispatch()
 
     const [title, setTitle] = useState("");
-    const [description, setDescription] = useState("");
+    const [userId, setUserId] = useState("")
     const [category, setCategory] = useState("");
+    const [description, setDescription] = useState("");
     const [date, setDate] = useState(new Date().toDateString());
     const { categories } = useAppSelector(state => state.category)
-    const [userId, setUserId] = useState("")
 
 
     useEffect(() => {
@@ -126,7 +126,6 @@ export const CreateUpdateTodoScreen = ({ navigation }: ICreateUpdateTodoScreenPr
                             backgroundColor: '#fffbfe',
                             top: 0,
                             marginTop: -5,
-                            // borderTopWidth: 0,
                         }}
                     />
 
@@ -135,7 +134,6 @@ export const CreateUpdateTodoScreen = ({ navigation }: ICreateUpdateTodoScreenPr
                         mode='outlined'
                         style={{
                             marginBottom: 10,
-                            // marginTop: 10,
                         }}
                         value={title}
                         onChange={(e) => {
@@ -170,7 +168,7 @@ export const CreateUpdateTodoScreen = ({ navigation }: ICreateUpdateTodoScreenPr
                         }}
                         initialDate={date}
                         markedDates={{
-                            [date]: { selected: true, marked: false, selectedColor: 'purple' },
+                            [date]: { selected: true, marked: false, selectedColor: '#de2820' },
                             // '2024-03-16': { selected: true, marked: true, selectedColor: 'blue' },
                             // '2024-03-17': { marked: true },
                             // '2024-03-18': { marked: true, dotColor: 'red', activeOpacity: 0 },
