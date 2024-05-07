@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "expo-todo-app",
-    "slug": "expo-todo-app",
+    "name": "pala-todo-app",
+    "slug": "pala-todo-app",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -16,21 +16,21 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.mrmesut.expotodoapp"
+      "bundleIdentifier": "com.mrmesut.palatodoapp"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.mrmesut.expotodoapp"
+      "package": "com.mrmesut.palatodoapp"
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
     "extra": {
       "eas": {
-        "projectId": "4b79f4e3-b489-4fa5-86e9-97c2e1350c8f"
+        "projectId": "5327f85f-083e-4782-9c91-2fbbef0e0019"
       }
     }
   }

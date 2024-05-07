@@ -48,29 +48,9 @@ export const AppRouter = () => {
                 initialRouteName={!onboarded ? "onboarding" : (isSignedIn ? "main" : "auth")}
             >
 
-                <Stack.Screen
-                    name='onboarding'
-                    component={OnboardingScreen}
-                    options={{
-                        title: ""
-                    }}
-                />
-
-                <Stack.Screen
-                    name='main'
-                    component={MainRouter}
-                    options={{
-                        title: ""
-                    }}
-                />
-
-                <Stack.Screen
-                    name='auth'
-                    component={AuthRouter}
-                    options={{
-                        title: ""
-                    }}
-                />
+                <Stack.Screen name='onboarding' component={OnboardingScreen} />
+                <Stack.Screen name='main' component={MainRouter} />
+                <Stack.Screen name='auth' component={AuthRouter} />
 
             </Stack.Navigator>
         </NavigationContainer>

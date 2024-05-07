@@ -16,46 +16,16 @@ import Toast from 'react-native-toast-message';
 import { useFonts } from 'expo-font';
 
 
-// const loadDatabase = async () => {
-//   const dbName = "expo-todo-app-1.db";
-//   const dbAsset = require("./assets/expo-todo-app-1.db");
-//   const dbUri = Asset.fromModule(dbAsset).uri;
-//   const dbFilePath = `${FileSystem.documentDirectory}SQLite/${dbName}`;
-
-//   const fileInfo = await FileSystem.getInfoAsync(dbFilePath);
-//   if (!fileInfo.exists) {
-//     await FileSystem.makeDirectoryAsync(
-//       `${FileSystem.documentDirectory}SQLite`,
-//       { intermediates: true }
-//     );
-//     await FileSystem.downloadAsync(dbUri, dbFilePath);
-//   }
-// };
-
 
 export default function App() {
 
-  // const [dbLoaded, setDbLoaded] = useState<boolean>(false);
   const [loaded] = useFonts({
     Ionicons: require('@expo/vector-icons/build/vendor/react-native-vector-icons/Fonts/Ionicons.ttf'),
   });
 
-  useEffect(() => {
-    // loadDatabase()
-    //   .then(() => {
-    //     setTimeout(() => {
-    //       setDbLoaded(true)
-    //     }, 500)
-    //   })
-    //   .catch((e) => console.error(e));
-  }, []);
-
-
   if (!loaded) {
     return null;
   }
-
-  // if (!dbLoaded) return null // <SplashScreen />
 
 
   return (
