@@ -74,7 +74,6 @@ export const LoginScreen = ({ navigation }: ScreenProps) => {
                 style={{
                     marginBottom: 10,
                     marginTop: 10,
-                    borderRadius: 0,
                 }}
                 value={name}
                 onChange={(e) => {
@@ -88,7 +87,7 @@ export const LoginScreen = ({ navigation }: ScreenProps) => {
                 style={{
                     marginBottom: 10,
                     marginTop: 10,
-                    borderRadius: 0,
+                    // fontSize: 26,
                 }}
                 value={password}
                 onChange={(e) => {
@@ -99,15 +98,15 @@ export const LoginScreen = ({ navigation }: ScreenProps) => {
             <Button
                 mode='contained'
                 style={{
-                    borderRadius: 0,
+                    borderRadius: 5,
                     marginBottom: 10,
                     marginTop: 10,
-                    padding: 8
+                    padding: 8,
+
                 }}
                 onPress={() => {
                     handleSubmit()
                 }}
-                buttonColor='#de2820'
                 disabled={!name || !password}
             >
                 Login

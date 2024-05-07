@@ -1,18 +1,16 @@
-import { FAB } from 'react-native-paper';
+import { Avatar } from 'react-native-paper';
+import React, { useCallback, useEffect, useState } from 'react'
 import { NavigationProp } from '@react-navigation/native';
-import React, { useEffect, useRef, useState } from 'react'
+import { Dimensions, FlatList, StyleSheet, Text, View } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { CalendarProvider, ExpandableCalendar } from 'react-native-calendars';
-import { Dimensions, FlatList, ScrollView, StyleSheet, Text, View } from 'react-native'
 
-import { ICategoryItem, ITodoItem } from '@/types';
 import { MainLayout } from '@/layouts';
-import { CategoriesSection } from '@/sections';
+import { ICategoryItem, ITodoItem } from '@/types';
 import { SectionTitle, TodoItemCard } from '@/components';
-import { setTodos, useAppDispatch, useAppSelector } from '@/context';
-import { categoryTableInit, deleteTodo, fetchTodos, todoTableInit, updateTodoCompletion } from '@/db';
-import { Ionicons } from '@expo/vector-icons';
-
+import { deleteTodo, fetchCategories, fetchTodos, updateTodoCompletion } from '@/db';
+import { setCategories, setTodos, updateTodo, useAppDispatch, useAppSelector } from '@/context';
+import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import Animated, { useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
 
 
 
@@ -25,24 +23,23 @@ export const HomeScreen = ({ navigation }: ScreenProps) => {
 
     const dispatch = useAppDispatch()
     const [userId, setUserId] = useState("")
+    const [loading, setLoading] = useState<any>(false)
     const [filteredTodos, setFilteredTodos] = useState<Array<ITodoItem>>([])
-    const todayBtnTheme = useRef({
-        todayButtonTextColor: "red",
-    });
 
     const { todos } = useAppSelector(state => state.todo)
 
     useEffect(() => {
-        todoTableInit();
-        categoryTableInit();
         getUserId()
     }, []);
+
 
     useEffect(() => {
         if (userId) {
             refreshTodos();
+            fetchCategories(userId, (array: Array<ICategoryItem>) => dispatch(setCategories(array)))
         }
     }, [userId]);
+
 
     useEffect(() => {
         setFilteredTodos(todos)
@@ -60,9 +57,12 @@ export const HomeScreen = ({ navigation }: ScreenProps) => {
         });
     };
 
-    const toggleTodoCompletion = (id: string, completed: any) => {
-        updateTodoCompletion(id, completed);
-        refreshTodos();
+    const toggleTodoCompletion = async (id: string, completed: any) => {
+        setLoading(id)
+        await updateTodoCompletion(id, completed, () => {
+            dispatch(updateTodo(id))
+        });
+        setLoading(false)
     };
 
     const removeTodo = (id: any) => {
@@ -70,144 +70,113 @@ export const HomeScreen = ({ navigation }: ScreenProps) => {
         refreshTodos();
     };
 
-    const handleFilterByDate = ({ dateString }: any) => {
-        const newList = todos?.filter((todo: ITodoItem) => todo.date === dateString)
-        setFilteredTodos(newList)
-    }
 
-    const handleFilterByCategory = (category: ICategoryItem) => {
-        console.log({ category });
-        const newList = todos?.filter((todo: ITodoItem) => todo.categoryId === category.title)
-        setFilteredTodos(newList)
-    }
 
     return (
-        <MainLayout>
-            <View style={styles.container}>
-                <CalendarProvider
-                    date={Date()}
-                    theme={todayBtnTheme.current}
-                    showTodayButton
-                    todayButtonStyle={{
-                        bottom: 90,
+        <MainLayout style={{ padding: 20, }}>
+
+            <View
+                style={{
+                    // padding: 20,
+                    // paddingHorizontal: 10,
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    marginBottom: 30,
+                    backgroundColor: '#f5edf9',
+                    padding: 10,
+                    paddingVertical: 20,
+                    borderRadius: 10,
+                }}
+            >
+                <Avatar.Icon icon="account" />
+                <View
+                    style={{
+                        flex: 1,
+                        justifyContent: 'center',
+                        marginLeft: 10
                     }}
                 >
-                    <View style={{ height: 180, zIndex: 10 }}>
-                        <ExpandableCalendar
-                            onDayPress={handleFilterByDate}
-                            firstDay={1}
-
-
-                            renderArrow={(prop) => {
-                                return (
-                                    <Ionicons
-                                        color="#de2820"
-                                        size={24}
-                                        name={prop === "left" ? 'arrow-back' : 'arrow-forward'}
-                                    />
-                                )
-                            }}
-                        />
-                    </View>
-
-                    <ScrollView
-                        style={styles.todosContainer}
-                        showsVerticalScrollIndicator={false}
+                    <Text
+                        style={{
+                            fontSize: 20,
+                            fontWeight: '600'
+                        }}
                     >
+                        Welcome User Name
+                    </Text>
+                    <Text>user@email.com</Text>
+                </View>
 
-                        <CategoriesSection
-                            navigation={navigation}
-                            handleFilterByCategory={handleFilterByCategory}
-                        />
+                {/* <TouchableOpacity>
+                    <Icon source="cog-outline" size={30} />
+                </TouchableOpacity> */}
+            </View>
 
-                        <ScrollView horizontal style={{ flex: 1 }} scrollEnabled={false}>
-                            <FlatList
-                                scrollEnabled={false}
-                                ListHeaderComponent={
-                                    <SectionTitle
-                                        title='Todos'
-                                        rightButton='All'
-                                        onPress={() => {
-                                            setFilteredTodos(todos)
-                                        }}
-                                    />
-                                }
-                                style={{
-                                    width: Dimensions.get('screen').width,
-                                    flex: 1,
-                                    // marginTop: 100,
-                                    // backgroundColor: 'green'
-                                }}
-                                contentContainerStyle={{
-                                    paddingBottom: 100
-                                }}
-
-                                data={filteredTodos}
-                                renderItem={({ item }: { item: ITodoItem }) => (
-                                    <TodoItemCard
-                                        item={item}
-                                        onDelete={() => {
-                                            removeTodo(item?.id ?? null)
-                                        }}
-                                        onPress={() => {
-                                            const isCompleted = item.isDone !== "inprogress" ? "inprogress" : "done"
-                                            toggleTodoCompletion(item?.id ? `${item?.id}` : "", isCompleted)
-                                        }}
-                                    />
-                                )}
-                                keyExtractor={(item, index) => `${item}-${index}`}
-                                ListEmptyComponent={() => {
-                                    return (
-                                        <View style={{ marginBottom: 20 }}>
-                                            <Text style={{ textAlign: 'center' }}>
-                                                There is no todo!
-                                            </Text>
-                                        </View>
-                                    )
-                                }}
-                            />
-
-
-
-                        </ScrollView>
-
-                    </ScrollView>
-
-                    <FAB
-                        icon="plus"
-                        color='#fff'
-                        style={styles.fab}
-
+            <FlatList
+                scrollEnabled={false}
+                ListHeaderComponent={
+                    <SectionTitle
+                        title='Things to do today'
+                        // rightButton='All'
+                        rightText='See All'
                         onPress={() => {
-                            navigation.navigate("main", {
-                                screen: "todo-create"
-                            })
+                            // setFilteredTodos(todos)
+                            navigation.navigate('search')
                         }}
                     />
+                }
 
-                </CalendarProvider>
-            </View>
+                style={{
+                    // width: Dimensions.get('screen').width,
+                    // flex: 1,
+                    // marginTop: 100,
+                    // backgroundColor: 'green'
+                }}
+                contentContainerStyle={{
+                    paddingBottom: 100
+                }}
+
+                data={filteredTodos}
+                renderItem={({ item, index }: { item: ITodoItem, index: number }) => {
+
+                    return (
+                        <TodoItemCard
+                            loading={loading == item.id}
+                            item={item}
+                            index={index}
+                            onDelete={() => {
+                                removeTodo(item?.id ?? null)
+                            }}
+                            onPress={() => {
+                                const isCompleted = item.isDone !== "inprogress" ? "inprogress" : "done"
+                                toggleTodoCompletion(item?.id ? `${item?.id}` : "", isCompleted)
+                            }}
+                        />
+                    )
+                }}
+                keyExtractor={(item, index) => `${item}-${index}`}
+                ListEmptyComponent={() => {
+                    return (
+                        <View style={{ marginBottom: 20 }}>
+                            <Text style={{ textAlign: 'center' }}>
+                                There is no todo!
+                            </Text>
+                        </View>
+                    )
+                }}
+            />
+
         </MainLayout>
     )
 }
 
+
 const styles = StyleSheet.create({
-    container: {
-        backgroundColor: '#ecf5ff',
-        flex: 1,
+    ball: {
+        width: 100,
+        height: 100,
+        borderRadius: 100,
+        backgroundColor: 'blue',
+        alignSelf: 'center',
     },
-
-    todosContainer: {
-        flex: 1,
-    },
-
-    fab: {
-        position: 'absolute',
-        margin: 16,
-        right: 0,
-        bottom: 0,
-        backgroundColor: '#de2820',
-        color: '#fff'
-    },
-
-})
+});

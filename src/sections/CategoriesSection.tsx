@@ -11,30 +11,14 @@ import { setCategories, useAppDispatch, useAppSelector } from '@/context'
 
 interface SectionProps {
     navigation: NavigationProp<any>,
-    handleFilterByCategory: (e: any) => any
+    handleFilterByCategory: (e: any) => any;
+    categories: Array<ICategoryItem>
 }
 
 
-export const CategoriesSection = ({ navigation, handleFilterByCategory }: SectionProps) => {
+export const CategoriesSection = ({ navigation, handleFilterByCategory, categories }: SectionProps) => {
 
-    const dispatch = useAppDispatch()
-    const [userId, setUserId] = useState("")
-    const { categories } = useAppSelector(state => state.category)
 
-    useEffect(() => {
-        getUserId()
-    }, []);
-
-    useEffect(() => {
-        if (userId) {
-            fetchCategories(userId, (array: Array<ICategoryItem>) => dispatch(setCategories(array)))
-        }
-    }, [userId]);
-
-    const getUserId = async () => {
-        const userId = await AsyncStorage.getItem('SIGNED');
-        setUserId(JSON.parse(userId ?? ""))
-    }
 
     return (
         <View>

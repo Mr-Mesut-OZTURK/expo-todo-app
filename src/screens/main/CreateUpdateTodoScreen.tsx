@@ -13,6 +13,7 @@ import { GoBackButton } from '@/components';
 import { todoTableInit, insertTodo, fetchTodos } from '@/db';
 import { setTodos, useAppDispatch, useAppSelector } from '@/context';
 import { Ionicons } from '@expo/vector-icons';
+import moment from 'moment';
 
 
 interface ICreateUpdateTodoScreenProps {
@@ -27,7 +28,7 @@ export const CreateUpdateTodoScreen = ({ navigation }: ICreateUpdateTodoScreenPr
     const [userId, setUserId] = useState("")
     const [category, setCategory] = useState("");
     const [description, setDescription] = useState("");
-    const [date, setDate] = useState(new Date().toDateString());
+    const [date, setDate] = useState(moment(Date.now()).format("YYYY-MM-DD"));
     const { categories } = useAppSelector(state => state.category)
 
 
@@ -116,16 +117,17 @@ export const CreateUpdateTodoScreen = ({ navigation }: ICreateUpdateTodoScreenPr
                         placeholder='Select Category'
 
                         boxStyles={{
-                            borderRadius: 3,
+                            borderRadius: 5,
                             backgroundColor: '#fffbfe',
                             marginBottom: 8,
                         }}
 
                         dropdownStyles={{
-                            borderRadius: 3,
+                            borderRadius: 5,
                             backgroundColor: '#fffbfe',
                             top: 0,
                             marginTop: -5,
+
                         }}
                     />
 
@@ -161,12 +163,17 @@ export const CreateUpdateTodoScreen = ({ navigation }: ICreateUpdateTodoScreenPr
                     <Calendar
                         // minDate={Date.now().toString()}
                         style={{
-                            borderRadius: 10,
+                            borderRadius: 5,
                             marginBottom: 20,
                             borderColor: '#777',
                             borderWidth: 1,
+                            backgroundColor: '#fffbfe'
+
                         }}
                         initialDate={date}
+                        theme={{
+                            calendarBackground: '#fffbfe',
+                        }}
                         markedDates={{
                             [date]: { selected: true, marked: false, selectedColor: '#de2820' },
                             // '2024-03-16': { selected: true, marked: true, selectedColor: 'blue' },
@@ -192,6 +199,7 @@ export const CreateUpdateTodoScreen = ({ navigation }: ICreateUpdateTodoScreenPr
                         mode='contained'
                         style={{
                             borderRadius: 5,
+                            padding: 8
                             // backgroundColor: '#de2820',
                         }}
                         buttonColor='#de2820'
@@ -216,6 +224,7 @@ const styles = StyleSheet.create({
         flex: 1,
         padding: 10,
         paddingBottom: 50,
+        // backgroundColor: '#ecf5ff'
     },
 
 
