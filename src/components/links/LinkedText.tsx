@@ -35,7 +35,7 @@ const styles = StyleSheet.create({
 
     },
     text: {
-        color: 'blue',
+        color: '#333',
         // padding: 10,
         // backgroundColor: 'red'
     }

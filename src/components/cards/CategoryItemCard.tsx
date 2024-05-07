@@ -1,5 +1,5 @@
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import React from 'react'
+import React, { memo } from 'react'
 import { ICategoryItem } from '@/types';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -11,7 +11,7 @@ interface ComponentProps {
     onDelete?: (e?: any) => void;
 }
 
-export const CategoryItemCard = ({ item, onPress, onDelete }: ComponentProps) => {
+export const CategoryItemCard = memo(({ item, onPress, onDelete }: ComponentProps) => {
 
 
     return (
@@ -48,7 +48,7 @@ export const CategoryItemCard = ({ item, onPress, onDelete }: ComponentProps) =>
             />)}
         </TouchableOpacity>
     )
-}
+})
 
 
 const styles = StyleSheet.create({

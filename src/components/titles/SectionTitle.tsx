@@ -37,7 +37,6 @@ export const SectionTitle = ({ rightText, rightButton, onPress, title }: Compone
                         style={{
                             borderRadius: 5,
                             backgroundColor: '#de2820',
-
                         }}
                     >
                         {rightButton}
@@ -56,7 +55,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         alignItems: 'center',
         marginBottom: 10,
-        paddingHorizontal: 10,
+        // paddingHorizontal: 10,
     },
     title: {
         fontWeight: '700',
