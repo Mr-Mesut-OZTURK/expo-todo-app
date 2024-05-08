@@ -58,7 +58,6 @@ const TabRouter = () => {
             }}
 
             tabBar={({ state }) => {
-                console.log(state.index);
                 return (
                     <Animated.View
                         entering={FadeInDown.delay(200)}

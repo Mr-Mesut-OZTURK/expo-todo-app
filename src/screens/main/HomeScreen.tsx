@@ -1,7 +1,7 @@
 import { Avatar } from 'react-native-paper';
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
+import { FlatList, Text, View } from 'react-native'
 import { NavigationProp } from '@react-navigation/native';
-import { Dimensions, FlatList, StyleSheet, Text, View } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import { MainLayout } from '@/layouts';
@@ -9,8 +9,7 @@ import { ICategoryItem, ITodoItem } from '@/types';
 import { SectionTitle, TodoItemCard } from '@/components';
 import { deleteTodo, fetchCategories, fetchTodos, updateTodoCompletion } from '@/db';
 import { setCategories, setTodos, updateTodo, useAppDispatch, useAppSelector } from '@/context';
-import { Gesture, GestureDetector } from 'react-native-gesture-handler';
-import Animated, { useAnimatedStyle, useSharedValue, withSpring, withTiming } from 'react-native-reanimated';
+import moment from 'moment';
 
 
 
@@ -42,7 +41,7 @@ export const HomeScreen = ({ navigation }: ScreenProps) => {
 
 
     useEffect(() => {
-        setFilteredTodos(todos)
+        setFilteredTodos(todos?.filter(item => item.date === moment(Date.now()).format("YYYY-MM-DD")))
     }, [todos])
 
 
@@ -52,7 +51,7 @@ export const HomeScreen = ({ navigation }: ScreenProps) => {
     }
 
     const refreshTodos = () => {
-        fetchTodos(userId, (array: any) => {
+        fetchTodos(userId, (array: Array<ITodoItem>) => {
             dispatch(setTodos(array))
         });
     };
@@ -169,14 +168,3 @@ export const HomeScreen = ({ navigation }: ScreenProps) => {
         </MainLayout>
     )
 }
-
-
-const styles = StyleSheet.create({
-    ball: {
-        width: 100,
-        height: 100,
-        borderRadius: 100,
-        backgroundColor: 'blue',
-        alignSelf: 'center',
-    },
-});

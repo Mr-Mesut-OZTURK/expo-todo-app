@@ -70,7 +70,6 @@ export const TodoItemCard = memo(({ item, onDelete, onPress, loading, index = 0 
     const start = useSharedValue(0);
     const gesture = Gesture.Pan()
         .onBegin((e) => {
-            // console.log({ e: e.absoluteX });
             ofsetRef.current = e.absoluteX
             isPressed.value = true;
             iconSize.value = 1
@@ -101,7 +100,6 @@ export const TodoItemCard = memo(({ item, onDelete, onPress, loading, index = 0 
     return (
         <GestureDetector gesture={gesture}>
             <Animated.View style={{ position: "relative" }}>
-
 
                 <Animated.View
                     entering={FadeInDown.springify().delay(index * 200)}
@@ -184,7 +182,6 @@ export const TodoItemCard = memo(({ item, onDelete, onPress, loading, index = 0 
                     }
 
                 </Animated.View>
-
 
                 <Animated.View
                     style={[

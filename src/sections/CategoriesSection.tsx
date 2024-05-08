@@ -29,11 +29,14 @@ export const CategoriesSection = ({ navigation, handleFilterByCategory, categori
                 onPress={() => {
                     navigation.navigate("main", { screen: 'categories' })
                 }}
+                style={{
+                    paddingHorizontal: 20
+                }}
             />
 
             <ScrollView
                 horizontal
-                style={{ marginBottom: 20, marginTop: 10 }}
+                style={{ marginBottom: 20, marginTop: 10, paddingLeft: 10 }}
                 showsVerticalScrollIndicator={false}
                 showsHorizontalScrollIndicator={false}
             >
@@ -41,6 +44,7 @@ export const CategoriesSection = ({ navigation, handleFilterByCategory, categori
                     categories?.map((item, index) => {
                         return (
                             <CategoryItemCard
+                                index={index}
                                 key={index}
                                 item={item}
                                 onPress={handleFilterByCategory}

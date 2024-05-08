@@ -26,7 +26,6 @@ export const TabbarItem = ({ item, isActive }: ITabbarItem) => {
     const fontSize = useSharedValue(0);
 
     const state = useNavigationState(state => state)
-    // console.log({ state: navigation });
 
 
     useEffect(() => {

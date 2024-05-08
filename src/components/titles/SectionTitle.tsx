@@ -12,11 +12,12 @@ interface ComponentProps {
     onPress?: (event?: any) => void;
     // before?: any;
     // after?: any;
+    style?: any
 }
 
-export const SectionTitle = ({ rightText, rightButton, onPress, title }: ComponentProps) => {
+export const SectionTitle = ({ rightText, rightButton, onPress, title, style }: ComponentProps) => {
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, style]}>
             <Text style={styles.title} >
                 {title}
             </Text>
@@ -56,6 +57,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginBottom: 10,
         // paddingHorizontal: 10,
+
     },
     title: {
         fontWeight: '700',

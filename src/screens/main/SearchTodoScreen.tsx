@@ -1,5 +1,5 @@
 import moment from 'moment';
-import { ActivityIndicator, FAB } from 'react-native-paper';
+import { FAB } from 'react-native-paper';
 import { Ionicons } from '@expo/vector-icons';
 import { NavigationProp } from '@react-navigation/native';
 import React, { useEffect, useRef, useState } from 'react'
@@ -155,9 +155,12 @@ export const SearchTodoScreen = ({ navigation }: ScreenProps) => {
                                 ListHeaderComponent={
                                     <SectionTitle
                                         title='Todos'
-                                        rightButton='All'
+                                        rightButton='+'
                                         onPress={() => {
-                                            setFilteredTodos(todos)
+                                            // setFilteredTodos(todos)
+                                            navigation.navigate("main", {
+                                                screen: "todo-create"
+                                            })
                                         }}
                                     />
                                 }
@@ -204,18 +207,6 @@ export const SearchTodoScreen = ({ navigation }: ScreenProps) => {
                         </ScrollView>
 
                     </ScrollView>
-
-                    <FAB
-                        icon="plus"
-                        color='#fff'
-                        style={styles.fab}
-
-                        onPress={() => {
-                            navigation.navigate("main", {
-                                screen: "todo-create"
-                            })
-                        }}
-                    />
 
                 </CalendarProvider>
             </View>

@@ -100,34 +100,38 @@ export const CategoriesScreen = ({ navigation }: ScreenProps) => {
 
 
     return (
-        <MainLayout>
-            <View style={styles.container}>
+        <MainLayout style={{ paddingHorizontal: 20, paddinTop: 20 }}>
 
-                <View style={styles.titleContainer}>
-                    <GoBackButton
-                        text='Geri'
-                        onPress={() => {
-                            navigation.goBack()
-                        }}
-                    />
-
-                    <Button
-                        mode='contained'
-                        style={styles.addButton}
-                        onPress={showModal}
-                    >
-                        Add New
-                    </Button>
-                </View>
-
-                <SectionTitle
-                    title='Categories'
-                // rightButton='Add New'
-                // onPress={() => {
-                //     showModal()
-                // }}
+            <View style={styles.titleContainer}>
+                <GoBackButton
+                    text='Back'
+                    onPress={() => {
+                        navigation.goBack()
+                    }}
                 />
 
+                <Button
+                    mode='contained'
+                    style={styles.addButton}
+                    onPress={showModal}
+                >
+                    Add New
+                </Button>
+            </View>
+
+            <SectionTitle
+                title='Categories'
+            // rightButton='Add New'
+            // onPress={() => {
+            //     showModal()
+            // }}
+            />
+
+            <ScrollView
+                horizontal
+                scrollEnabled={false}
+                contentContainerStyle={{ flex: 1 }}
+            >
                 <FlatList
                     showsVerticalScrollIndicator={false}
                     data={categories}
@@ -154,10 +158,16 @@ export const CategoriesScreen = ({ navigation }: ScreenProps) => {
                         )
                     }}
                 />
+            </ScrollView>
 
-                <Portal>
-                    <Modal visible={visible} onDismiss={hideModal} contentContainerStyle={styles.containerStyle}>
+            <Portal>
+                <Modal visible={visible} onDismiss={hideModal} contentContainerStyle={styles.containerStyle}>
 
+                    <ScrollView
+                        horizontal
+                        scrollEnabled={false}
+                        contentContainerStyle={{ flex: 1 }}
+                    >
                         <ScrollView>
                             <Text style={styles.title}>
                                 Create Category.
@@ -223,21 +233,21 @@ export const CategoriesScreen = ({ navigation }: ScreenProps) => {
                                 Create Category
                             </Button>
                         </ScrollView>
+                    </ScrollView>
 
-                    </Modal>
-                </Portal>
+                </Modal>
+            </Portal>
 
-            </View>
         </MainLayout>
     )
 }
 
 
 const styles = StyleSheet.create({
-    container: {
-        padding: 10,
-        paddingTop: 30,
-    },
+    // container: {
+    //     padding: 10,
+    //     paddingTop: 30,
+    // },
     titleContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',

@@ -84,7 +84,7 @@ export const CreateUpdateTodoScreen = ({ navigation }: ICreateUpdateTodoScreenPr
             <ScrollView style={styles.container}>
 
                 <GoBackButton
-                    text='Geri'
+                    text='Back'
                     onPress={() => {
                         navigation.goBack()
                     }}
